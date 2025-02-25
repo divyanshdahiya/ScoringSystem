@@ -1,13 +1,301 @@
-body {
+/* General Styles */
+*{
+  box-sizing: border-box;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+}
+body {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  width: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  height: 100vh;
+  
+}
+h1 {
+  font-size: 2vw;
+  margin: 0;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+h2 {
+  font-size: 1.5vw;
+}
+
+p {
+  font-size: 1.2vw;
+  margin-bottom: 20px;
+}
+.scorecard {
+  padding: 25px;
+  text-align: center;
+}
+.score-header{
+  display: flex;
+  margin-bottom: 10px;
+}
+.score-header-logo{
+  align-items: center;
+  width: 25%;
+}
+.score-header-logo img{
+  width: 40%;
+}
+.score-header-title{
+  width: 70%;
+  align-items: center;
+  justify-content: center;
+}
+.score-header-title h1{
+  font-size: 3vw;
+  padding: 10px;
+  font-weight: 900;
+}
+.score-header-title h2{
+  background-color: rgb(41, 41, 114);
+  color: white;
+  padding: 10px;
+  font-size: 1.5vw;
+}
+.score-match-details{
+  font-size: 1.7vw;
+}
+
+.score-box {
+  width: 50%;        /* center div */
+  margin: 0 auto; 
+  display: flex;
+  max-width: 32%;
+  align-items: center;
+  justify-content: center;
+  background: #e0e0e0;
+  padding: 10px;
+  border-radius: 10px;
+}
+.score-box h1{
+  font-size: 7vw;
+  padding: 5px;
+}
+.score1{
+  background-color: orange;
+}
+.team1{
+  display: flex;
+}
+.team2{
+  display: flex;
+}
+
+.team .flag {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin: 0 10px;
+}
+
+.score {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: navy;
+}
+
+/* Set Table */
+.sets {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  margin: auto;
+}
+
+.sets td {
+  padding: 10px 50px;
+  border: 2px solid #333;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+/* Controls */
+.controls {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.btn.red {
+  background: red;
+  color: white;
+}
+
+.btn.blue {
+  background: blue;
+  color: white;
+}
+
+.btn.reset {
+  background: gray;
+  color: white;
+}
+
+.btn:hover {
+  opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .score-box {
+    grid-template-columns: 1fr;
+  }
+
+  .team {
+    flex-direction: column;
+  }
+
+  .score {
+    font-size: 2rem;
+    margin: 10px 0;
+  }
+}
+
+
+/* Controls.css */
+.controls-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+}
+
+.timeout {
+  background-color: red;
+  color: white;
+}
+
+.cancel-timeout {
+  background-color: gray;
+  color: white;
+}
+
+.serve {
+  background-color: blue;
+  color: white;
+}
+
+.edit-score {
+  background-color: orange;
+  color: white;
+}
+
+.change-side {
+  background-color: purple;
+  color: white;
+}
+
+.reset {
+  background-color: black;
+  color: white;
+}
+
+.score-controls {
+  display: flex;
+  gap: 20px;
+}
+
+.team-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.add {
+  background-color: green;
+  color: white;
+}
+
+.subtract {
+  background-color: brown;
+  color: white;
+}
+
+.timer {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.vs-banner{
+  display: flex;
+  justify-content: space-around;
+  height: 10vh;
+}
+.vs-teams{
+  display: flex;
+  align-items: center;
+  background-color: rgb(231, 255, 255);
+  width: 100%;
+  justify-content: center;
+}
+.team-name{
+  text-transform: uppercase;
+}
+.vs-teams h2{
+  font-size: 2.5vw;
+}
+.vs-flag{
+  border-radius: 50%;
+  position: relative;
+  top: -50px;
+}
+/* Container for the VS triangle shape */
+.vs-container {
+  position: relative;
+  margin: 0 20px;
+  width: 50px;
+  height: 50px;
+  background: #1c4e8f; /* change to your preferred color */
+  clip-path: polygon(50% 100%, 100% 0%, 0% 0%);
+    border-radius: 20%; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* VS text inside the triangle */
+.vs-box {
+  position: absolute;
+  top: 43%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #fff;
 }
