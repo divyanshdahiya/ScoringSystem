@@ -42,23 +42,23 @@ function Controls() {
       <button className="btn edit-score">EDIT SCORE</button>
       <div className="score-controls">
         <div className="team-controls">
-          <button className="btn add" onClick={() => updateScore("player1", 1)}>
+          <button className="btn add" onClick={() => updateScore("team1", 1)}>
             +1
           </button>
           <button
             className="btn subtract"
-            onClick={() => updateScore("player1", -1)}
+            onClick={() => updateScore("team1", -1)}
           >
             -1
           </button>
         </div>
         <div className="team-controls">
-          <button className="btn add" onClick={() => updateScore("player2", 1)}>
+          <button className="btn add" onClick={() => updateScore("team2", 1)}>
             +1
           </button>
           <button
             className="btn subtract"
-            onClick={() => updateScore("player2", -1)}
+            onClick={() => updateScore("team2", -1)}
           >
             -1
           </button>

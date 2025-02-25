@@ -2,8 +2,10 @@ import React from "react";
 import { useScoreStore } from "./store";
 
 function Scorecard() {
-  const { matchDetails, teams, sets } = useScoreStore();
-  console.log("Updated sets:", sets);
+  const { matchDetails, teams, sets, scoreActive } = useScoreStore();
+  if (!teams?.team1 || !teams?.team2) {
+    return <p>Loading scores... Please wait.</p>;
+  }
   return (
     <div className="scorecard">
       <div className="score-header">
@@ -26,15 +28,15 @@ function Scorecard() {
 
       <div>
         <div className="score-box">
-          {/* {servingTeam === "player1" && <span>🏐</span>} */}
-          <div className="score1">
-            <h1>{teams.player1.score}</h1>
+          {/* {servingTeam === "team1" && <span>🏐</span>} */}
+          <div className={scoreActive === "team1" ? "score-active" : ""}>
+            <h1>{teams.team1.score}</h1>
           </div>
           <h1>-</h1>
-          <div className="score2">
-            <h1>{teams.player2.score}</h1>
+          <div className={scoreActive === "team2" ? "score-active" : ""}>
+            <h1>{teams.team2.score}</h1>
           </div>
-          {/* {servingTeam === "player2" && <span>🏐</span>} */}
+          {/* {servingTeam === "team2" && <span>🏐</span>} */}
         </div>
       </div>
       <div className="vs-banner">
@@ -47,13 +49,13 @@ function Scorecard() {
         </div>
 
         <div className="vs-teams">
-          <h2 className="team-name">{teams.player1.name}</h2>
+          <h2 className="team-name">{teams.team1.name}</h2>
           <div className="vs-container">
             <span className="vs-box">
               <h3>VS</h3>
             </span>
           </div>
-          <h2 className="team-name">{teams.player2.name}</h2>
+          <h2 className="team-name">{teams.team2.name}</h2>
         </div>
         <div className="s">
           <img
@@ -68,9 +70,9 @@ function Scorecard() {
         <tbody>
           {sets.map((set, index) => (
             <tr key={index}>
-              <td>{set.player1}</td>
+              <td>{set.team1}</td>
               <td>Set {index + 1}</td>
-              <td>{set.player2}</td>
+              <td>{set.team2}</td>
             </tr>
           ))}
         </tbody>

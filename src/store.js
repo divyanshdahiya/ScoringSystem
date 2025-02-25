@@ -14,84 +14,112 @@ export const useScoreStore = create((set) => ({
     court: "Court 1",
   },
   currentSet: JSON.parse(localStorage.getItem("currentSet")) || 0,
-  teams: JSON.parse(localStorage.getItem("teams")) || {
-    player1: { name: "Thailand", score: 0, flag: "thailand.png" },
-    player2: { name: "Myanmar", score: 0, flag: "myanmar.png" },
+  teams: JSON.parse(localStorage.getItem("teams")) ?? {
+    team1: { name: "Thailand", score: 0, flag: "thailand.png" },
+    team2: { name: "Myanmar", score: 0, flag: "myanmar.png" },
   },
-  sets: JSON.parse(localStorage.getItem("sets")) || [
-    { player1: 0, player2: 0 },
-    { player1: 0, player2: 0 },
-    { player1: 0, player2: 0 },
+  sets: JSON.parse(localStorage.getItem("sets")) ?? [
+    { team1: 0, team2: 0 },
+    { team1: 0, team2: 0 },
+    { team1: 0, team2: 0 },
   ],
   serveTimer: null,
   timeoutTimer: null,
+  scoreActive: JSON.parse(localStorage.getItem("scoreActive")) ?? "team1",
 
-  updateScore: (player, change = 1) =>
+  updateScore: (team, change = 1) =>
     set((state) => {
-      const newScore = Math.max(0, state.teams[player].score + change); // Prevent negative scores
-  
+      const newScore = Math.max(0, state.teams[team].score + change); // Prevent negative scores
+
       const updatedTeams = {
         ...state.teams,
-        [player]: { ...state.teams[player], score: newScore },
+        [team]: { ...state.teams[team], score: newScore },
       };
-        
+      const updateScoreActive =team === "team1" ? "team1" : "team2";
+
       // Save to localStorage
-      localStorage.setItem("teams", JSON.stringify(updatedTeams));
-  
+      setTimeout(() => {
+        localStorage.setItem("teams", JSON.stringify(updatedTeams));
+        localStorage.setItem("scoreActive", JSON.stringify(updateScoreActive));
+      }, 0);
+
       // Broadcast state change
-      channel.postMessage({ type: "UPDATE_SCORE", teams: updatedTeams });
-  
-      return { teams: updatedTeams };
+      channel.postMessage({
+        type: "UPDATE_SCORE",
+        teams: updatedTeams,
+        scoreActive: team,
+      });
+
+      return { teams: updatedTeams, scoreActive: updateScoreActive };
     }),
 
-    changeSide: () => set((state) => {
+  changeSide: () =>
+    set((state) => {
       const validSetIndex = Math.min(state.currentSet, state.sets.length - 1);
-    
+
       // 🛑 Stop updating if the last set is already filled
-      if (validSetIndex === state.sets.length - 1 && state.sets[validSetIndex].player1 !== 0 && state.sets[validSetIndex].player2 !== 0) {
+      if (
+        validSetIndex === state.sets.length - 1 &&
+        state.sets[validSetIndex].team1 !== 0 &&
+        state.sets[validSetIndex].team2 !== 0
+      ) {
         console.log("⚠️ Match completed! No more updates allowed.");
         return {}; // No state change
       }
-    
-      const updatedSets = [...state.sets];
-      updatedSets[validSetIndex] = {
-        player1: state.teams.player1.score,
-        player2: state.teams.player2.score,
-      };
-    
+
+      const updatedSets = state.sets.map((set, index) =>
+        index === validSetIndex
+          ? {
+              team1: state.teams.team1.score,
+              team2: state.teams.team2.score,
+            }
+          : set
+      );
+
       // Prevent incrementing beyond 3rd set
-      const nextSet = validSetIndex + 1 < state.sets.length ? validSetIndex + 1 : validSetIndex;
-    
+      const nextSet =
+        validSetIndex + 1 < state.sets.length
+          ? validSetIndex + 1
+          : validSetIndex;
+
       // Reset scores only if the next set is valid
-      const updatedTeams = nextSet !== validSetIndex ? {
-        player1: { ...state.teams.player1, score: 0 },
-        player2: { ...state.teams.player2, score: 0 },
-      } : state.teams; // Keep same teams if no new set is available
-    
+      const updatedTeams =
+        nextSet !== validSetIndex
+          ? {
+              team1: { ...state.teams.team1, score: 0 },
+              team2: { ...state.teams.team2, score: 0 },
+            }
+          : state.teams; // Keep same teams if no new set is available
+
       // Save updated data to localStorage
       localStorage.setItem("sets", JSON.stringify(updatedSets));
       localStorage.setItem("teams", JSON.stringify(updatedTeams));
       localStorage.setItem("currentSet", JSON.stringify(nextSet));
-    
+
       // Broadcast the update
-      channel.postMessage({ 
-        type: "CHANGE_SIDE", 
-        sets: updatedSets, 
-        teams: updatedTeams, 
-        currentSet: nextSet 
+      channel.postMessage({
+        type: "CHANGE_SIDE",
+        sets: updatedSets,
+        teams: updatedTeams,
+        currentSet: nextSet,
       });
-    
-      return { sets: updatedSets, teams: updatedTeams, currentSet: nextSet };
+
+      return {
+        sets: updatedSets,
+        teams: updatedTeams,
+        currentSet: nextSet,
+      };
     }),
-  
+
   startServeTimer: () => {
+    let interval;
     set(() => ({ serveTimer: 15 }));
 
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
       set((state) => {
         if (state.serveTimer <= 1) {
           clearInterval(interval);
-          return { serveTimer: 15 };
+          return { serveTimer: null };
         }
         return { serveTimer: state.serveTimer - 1 };
       });
@@ -99,9 +127,10 @@ export const useScoreStore = create((set) => ({
   },
 
   startTimeoutTimer: () => {
+    let interval;
     set(() => ({ timeoutTimer: 120 }));
 
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
       set((state) => {
         if (state.timeoutTimer <= 1) {
           clearInterval(interval);
@@ -115,23 +144,30 @@ export const useScoreStore = create((set) => ({
 
 // 🟢 Listen for messages from other tabs
 channel.onmessage = (event) => {
-  console.log("Broadcast received:", event.data); // Debugging
-  if (event.data.type === "UPDATE_SCORE") {
-    useScoreStore.setState({ teams: event.data.teams });
+  console.log("Broadcast received:", event.data);
+
+  switch (event.data.type) {
+    case "UPDATE_SCORE":
+      useScoreStore.setState({ teams: event.data.teams, scoreActive: event.data.scoreActive  });
+      break;
+    case "CHANGE_SIDE":
+      useScoreStore.setState({
+        sets: event.data.sets,
+        teams: event.data.teams,
+        currentSet: event.data.currentSet,
+      });
+      break;
+    case "RESET_SCORES":
+      useScoreStore.setState({
+        teams: event.data.teams,
+        sets: event.data.sets,
+      });
+      break;
+    default:
+      console.warn("Unknown message type:", event.data.type);
   }
-  if (event.data.type === "CHANGE_SIDE") {
-    useScoreStore.setState({
-      sets: event.data.sets,
-      teams: event.data.teams,
-      currentSet: event.data.currentSet,
-    });
-  }
-  if (event.data.type === "RESET_SCORES") {
-    useScoreStore.setState({ teams: event.data.teams, sets: event.data.sets });
-  }
+  useScoreStore.setState((state) => ({ ...state }));
 };
-
-
 
 // // working solution without local storage store.js (Zustand Store)
 // import { create } from "zustand";
@@ -147,40 +183,38 @@ channel.onmessage = (event) => {
 //     court: "Court 1",
 //   },
 //   teams: {
-//     player1: { name: "Thailand", score: 8, flag: "thailand.png" },
-//     player2: { name: "Myanmar", score: 13, flag: "myanmar.png" },
+//     team1: { name: "Thailand", score: 8, flag: "thailand.png" },
+//     team2: { name: "Myanmar", score: 13, flag: "myanmar.png" },
 //   },
 //   sets: [
-//     { player1: 5, player2: 15 },
-//     { player1: 0, player2: 0 },
-//     { player1: 0, player2: 0 },
+//     { team1: 5, team2: 15 },
+//     { team1: 0, team2: 0 },
+//     { team1: 0, team2: 0 },
 //   ],
 //   serveTimer: null,
 //   timeoutTimer: null,
-// updateScore: (player, change = 1) =>
+// updateScore: (team, change = 1) =>
 //     set((state) => ({
 //       teams: {
 //         ...state.teams,
-//         [player]: { 
-//           ...state.teams[player], 
-//           score: Math.max(0, state.teams[player].score + change) // Prevent negative scores
+//         [team]: {
+//           ...state.teams[team],
+//           score: Math.max(0, state.teams[team].score + change) // Prevent negative scores
 //         },
 //       },
 //     })),
 // //   resetScores: () =>
 // //     set(() => ({
 // //       teams: {
-// //         player1: { name: "Thailand", score: 0, flag: "thailand.png" },
-// //         player2: { name: "Myanmar", score: 0, flag: "myanmar.png" },
+// //         team1: { name: "Thailand", score: 0, flag: "thailand.png" },
+// //         team2: { name: "Myanmar", score: 0, flag: "myanmar.png" },
 // //       },
 // //       sets: [
-// //         { player1: 0, player2: 0 },
-// //         { player1: 0, player2: 0 },
-// //         { player1: 0, player2: 0 },
+// //         { team1: 0, team2: 0 },
+// //         { team1: 0, team2: 0 },
+// //         { team1: 0, team2: 0 },
 // //       ],
 // //     })),
-
-
 
 //   startServeTimer: () => {
 //     set({ serveTimer: 15 });
@@ -202,7 +236,5 @@ channel.onmessage = (event) => {
 //       });
 //     }, 1000);
 //   },
-
-
 
 // }));
