@@ -2,8 +2,15 @@ import React from "react";
 import { useScoreStore } from "./store";
 
 function Scorecard() {
-  const { matchDetails, teams, sets, scoreActive, timeoutTimer, serveTimer } =
-    useScoreStore();
+  const {
+    matchDetails,
+    teams,
+    sets,
+    scoreActive,
+    timeoutTimer,
+    serveTimer,
+    servingTeam,
+  } = useScoreStore();
   if (!teams?.team1 || !teams?.team2) {
     return <p>Loading scores... Please wait.</p>;
   }
@@ -29,15 +36,15 @@ function Scorecard() {
 
       <div>
         <div className="score-box">
-          {/* {servingTeam === "team1" && <span>🏐</span>} */}
           <div className={scoreActive === "team1" ? "score-active" : ""}>
+            {servingTeam === "team1" && <span className="ball-emoji">🏐</span>}
             <h1>{teams.team1.score}</h1>
           </div>
           <h1>-</h1>
           <div className={scoreActive === "team2" ? "score-active" : ""}>
             <h1>{teams.team2.score}</h1>
+            {servingTeam === "team2" && <span className="ball-emoji">🏐</span>}
           </div>
-          {/* {servingTeam === "team2" && <span>🏐</span>} */}
         </div>
       </div>
       <div className="vs-banner">

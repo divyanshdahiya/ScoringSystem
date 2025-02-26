@@ -13,7 +13,6 @@ body {
   align-items: center;
   justify-content: center;
   margin: auto;
-  height: 100vh;
   
 }
 h1 {
@@ -298,4 +297,8 @@ p {
   font-size: 0.9rem;
   font-weight: bold;
   color: #fff;
+}
+.ball-emoji {
+  font-size: 2rem;
+  margin-left: 10px;
 }

@@ -13,6 +13,8 @@ function Controls() {
     scoreActive,
     teams,
     sets,
+    servingTeam,
+    changeServe,
   } = useScoreStore();
 
   return (
@@ -70,20 +72,20 @@ function Controls() {
       <button className="btn change-side" onClick={changeSide}>
         CHANGE SIDE
       </button>
-      {/* <button className="btn reset" onClick={resetScores}>
-        RESET
-      </button> */}
+      <button className="btn change-side" onClick={changeServe}>
+        CHANGE SERVE
+      </button>
 
       <div className="score-box">
-        {/* {servingTeam === "team1" && <span>🏐</span>} */}
         <div className={scoreActive === "team1" ? "score-active" : ""}>
+          {servingTeam === "team1" && <span className="ball-emoji">🏐</span>}
           <h1>{teams.team1.score}</h1>
         </div>
         <h1>-</h1>
         <div className={scoreActive === "team2" ? "score-active" : ""}>
           <h1>{teams.team2.score}</h1>
+          {servingTeam === "team2" && <span className="ball-emoji">🏐</span>}
         </div>
-        {/* {servingTeam === "team2" && <span>🏐</span>} */}
       </div>
 
       <div>

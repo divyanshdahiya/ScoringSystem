@@ -25,6 +25,7 @@ export const useScoreStore = create((set) => ({
   ],
   serveTimer: null,
   timeoutTimer: null,
+  servingTeam: JSON.parse(localStorage.getItem("servingTeam")) || "team1",
   scoreActive: JSON.parse(localStorage.getItem("scoreActive")) ?? "team1",
 
   updateScore: (team, change = 1) =>
@@ -36,11 +37,13 @@ export const useScoreStore = create((set) => ({
         [team]: { ...state.teams[team], score: newScore },
       };
       const updateScoreActive = team === "team1" ? "team1" : "team2";
+      const newServingTeam = state.servingTeam === "team1" ? "team2" : "team1";
 
       // Save to localStorage
       setTimeout(() => {
         localStorage.setItem("teams", JSON.stringify(updatedTeams));
         localStorage.setItem("scoreActive", JSON.stringify(updateScoreActive));
+        localStorage.setItem("servingTeam", JSON.stringify(newServingTeam));
       }, 0);
 
       // Broadcast state change
@@ -48,9 +51,10 @@ export const useScoreStore = create((set) => ({
         type: "UPDATE_SCORE",
         teams: updatedTeams,
         scoreActive: team,
+        servingTeam: newServingTeam,
       });
 
-      return { teams: updatedTeams, scoreActive: updateScoreActive };
+      return { teams: updatedTeams, scoreActive: updateScoreActive, servingTeam: newServingTeam };
     }),
 
   changeSide: () =>
@@ -158,6 +162,21 @@ export const useScoreStore = create((set) => ({
       });
     }, 1000);
   },
+  changeServe: () =>
+    set((state) => {
+      const newServingTeam = state.servingTeam === "team1" ? "team2" : "team1";
+
+      // Save to localStorage
+      localStorage.setItem("servingTeam", JSON.stringify(newServingTeam));
+
+      // Broadcast the change to other tabs
+      channel.postMessage({
+        type: "CHANGE_SERVE",
+        servingTeam: newServingTeam,
+      });
+
+      return { servingTeam: newServingTeam };
+    }),
 }));
 
 // 🟢 Listen for messages from other tabs
@@ -169,6 +188,7 @@ channel.onmessage = (event) => {
       useScoreStore.setState({
         teams: event.data.teams,
         scoreActive: event.data.scoreActive,
+        servingTeam: event.data.servingTeam,
       });
       break;
     case "CHANGE_SIDE":
@@ -206,6 +226,9 @@ channel.onmessage = (event) => {
     case "END_SERVE":
       useScoreStore.setState({ serveTimer: null });
       break;
+      case "CHANGE_SERVE":
+        useScoreStore.setState({ servingTeam: event.data.servingTeam });
+        break;
     default:
       console.warn("Unknown message type:", event.data.type);
   }
