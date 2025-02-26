@@ -10,6 +10,9 @@ function Controls() {
     startServeTimer,
     startTimeoutTimer,
     changeSide,
+    scoreActive,
+    teams,
+    sets,
   } = useScoreStore();
 
   return (
@@ -70,6 +73,32 @@ function Controls() {
       {/* <button className="btn reset" onClick={resetScores}>
         RESET
       </button> */}
+
+      <div className="score-box">
+        {/* {servingTeam === "team1" && <span>🏐</span>} */}
+        <div className={scoreActive === "team1" ? "score-active" : ""}>
+          <h1>{teams.team1.score}</h1>
+        </div>
+        <h1>-</h1>
+        <div className={scoreActive === "team2" ? "score-active" : ""}>
+          <h1>{teams.team2.score}</h1>
+        </div>
+        {/* {servingTeam === "team2" && <span>🏐</span>} */}
+      </div>
+
+      <div>
+        <table className="sets">
+          <tbody>
+            {sets.map((set, index) => (
+              <tr key={index}>
+                <td>{set.team1}</td>
+                <td>Set {index + 1}</td>
+                <td>{set.team2}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

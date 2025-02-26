@@ -12,7 +12,7 @@ function Scorecard() {
       <div className="score-header">
         <div className="score-header-logo">
           <img
-            src="https://media.discordapp.net/attachments/1061730494175256616/1342873096398311547/image.png?ex=67bb3787&is=67b9e607&hm=e4045410db631f090085c86699bf20ff4f29e5173429987c2f2e70f838db4ce0&=&format=webp&quality=lossless&width=311&height=453"
+            src="https://media.discordapp.net/attachments/1061730494175256616/1342873096398311547/image.png?ex=67c07d87&is=67bf2c07&hm=8c5ebb44b153f9c788cee7e43e45ba07f9ab597078817a87dab383920f7e2c37&=&format=webp&quality=lossless&width=311&height=453"
             alt="LOGO"
           />
         </div>

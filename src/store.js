@@ -35,7 +35,7 @@ export const useScoreStore = create((set) => ({
         ...state.teams,
         [team]: { ...state.teams[team], score: newScore },
       };
-      const updateScoreActive =team === "team1" ? "team1" : "team2";
+      const updateScoreActive = team === "team1" ? "team1" : "team2";
 
       // Save to localStorage
       setTimeout(() => {
@@ -129,7 +129,7 @@ export const useScoreStore = create((set) => ({
         }
         const newTime1 = state.serveTimer - 1;
         channel.postMessage({ type: "UPDATE_SERVE", serveTimer: newTime1 }); // Broadcast update
-        return { serveTimer: state.serveTimer - 1,serveTimer: newTime1  };
+        return { serveTimer: state.serveTimer - 1, serveTimer: newTime1 };
       });
     }, 1000);
   },
@@ -137,13 +137,13 @@ export const useScoreStore = create((set) => ({
   startTimeoutTimer: () => {
     let interval;
     set(() => ({ timeoutTimer: 10 }));
-  
+
     // Broadcast the timeout start event
     channel.postMessage({
       type: "START_TIMEOUT",
       timeoutTimer: 10,
     });
-  
+
     interval = setInterval(() => {
       set((state) => {
         if (state.timeoutTimer <= 1) {
@@ -151,7 +151,7 @@ export const useScoreStore = create((set) => ({
           channel.postMessage({ type: "END_TIMEOUT" }); // Notify other tabs when timeout ends
           return { timeoutTimer: null };
         }
-  
+
         const newTime = state.timeoutTimer - 1;
         channel.postMessage({ type: "UPDATE_TIMEOUT", timeoutTimer: newTime }); // Broadcast update
         return { timeoutTimer: newTime };
@@ -166,7 +166,10 @@ channel.onmessage = (event) => {
 
   switch (event.data.type) {
     case "UPDATE_SCORE":
-      useScoreStore.setState({ teams: event.data.teams, scoreActive: event.data.scoreActive  });
+      useScoreStore.setState({
+        teams: event.data.teams,
+        scoreActive: event.data.scoreActive,
+      });
       break;
     case "CHANGE_SIDE":
       useScoreStore.setState({
@@ -181,28 +184,28 @@ channel.onmessage = (event) => {
         sets: event.data.sets,
       });
       break;
-      case "START_TIMEOUT":
-        useScoreStore.setState({ timeoutTimer: event.data.timeoutTimer });
-        break;
-  
-      case "UPDATE_TIMEOUT":
-        useScoreStore.setState({ timeoutTimer: event.data.timeoutTimer });
-        break;
-  
-      case "END_TIMEOUT":
-        useScoreStore.setState({ serveTimer: null });
-        break;
-        case "START_SERVE":
-          useScoreStore.setState({ serveTimer: event.data.serveTimer });
-          break;
-    
-        case "UPDATE_SERVE":
-          useScoreStore.setState({ serveTimer: event.data.serveTimer });
-          break;
-    
-        case "END_SERVE":
-          useScoreStore.setState({ serveTimer: null });
-          break;      
+    case "START_TIMEOUT":
+      useScoreStore.setState({ timeoutTimer: event.data.timeoutTimer });
+      break;
+
+    case "UPDATE_TIMEOUT":
+      useScoreStore.setState({ timeoutTimer: event.data.timeoutTimer });
+      break;
+
+    case "END_TIMEOUT":
+      useScoreStore.setState({ serveTimer: null });
+      break;
+    case "START_SERVE":
+      useScoreStore.setState({ serveTimer: event.data.serveTimer });
+      break;
+
+    case "UPDATE_SERVE":
+      useScoreStore.setState({ serveTimer: event.data.serveTimer });
+      break;
+
+    case "END_SERVE":
+      useScoreStore.setState({ serveTimer: null });
+      break;
     default:
       console.warn("Unknown message type:", event.data.type);
   }
