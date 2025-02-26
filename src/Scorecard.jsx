@@ -2,7 +2,8 @@ import React from "react";
 import { useScoreStore } from "./store";
 
 function Scorecard() {
-  const { matchDetails, teams, sets, scoreActive } = useScoreStore();
+  const { matchDetails, teams, sets, scoreActive, timeoutTimer, serveTimer } =
+    useScoreStore();
   if (!teams?.team1 || !teams?.team2) {
     return <p>Loading scores... Please wait.</p>;
   }
@@ -77,6 +78,22 @@ function Scorecard() {
           ))}
         </tbody>
       </table>
+      <div>
+        timeout -{/* Timeout Timer Display */}
+        {timeoutTimer !== null && (
+          <div className="timeout-timer">
+            <h2>Timeout: {timeoutTimer}</h2>
+          </div>
+        )}
+      </div>
+      <div>
+        serve -{/* Serve Timer Display */}
+        {serveTimer !== null && (
+          <div className="serve-timer">
+            <h2>Serve: {serveTimer}</h2>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
