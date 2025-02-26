@@ -50,7 +50,7 @@ export const useScoreStore = create((set) => ({
       channel.postMessage({
         type: "UPDATE_SCORE",
         teams: updatedTeams,
-        scoreActive: team,
+        scoreActive: updateScoreActive,
         servingTeam: newServingTeam,
       });
 
